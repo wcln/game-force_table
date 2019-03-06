@@ -1,9 +1,44 @@
 #container {
-  width: 600px;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  text-align: center;
+  border: 1px solid black;
+  font-family: "Century Gothic", Arial;
 }
 
 canvas {
-  border: 1px solid black;
+
+  float: left;
+}
+
+#container img {
+  height: 30px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+#controls {
+  height: 400px;
+}
+
+#controls input[type='text'] {
+  margin-top: .5em;
+  margin-bottom: 1em;
+  padding: 5px 5px;
+  box-sizing: border-box;
+  font-size: 20px;
+}
+
+button#submit {
+  background-color: #42bcf4;
+  border: none;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
 }

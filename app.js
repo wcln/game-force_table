@@ -72,7 +72,7 @@ function drawVector(vector) {
   arrowHeadClone.scaleX = arrowHeadClone.scaleY = 0.1;
   stage.addChild(arrowHeadClone);
 
-  var vectorText = new createjs.Text(vector.magnitude + " N", "16px Arial", "black");
+  var vectorText = new createjs.Text(vector.magnitude + " N", "16px Century Gothic", "black");
   if (vector.direction < 90 || vector.direction > 270) {
     vectorText.x = x + 10;
   } else {

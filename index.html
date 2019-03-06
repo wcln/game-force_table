@@ -11,7 +11,21 @@
 </head>
 <body onload="init()">
   <div id="container">
+    <img src="images/logo.png"/>
+    <h1>Force Table</h1>
     <canvas width="430px" height="400px" id="gameCanvas"></canvas>
+    <div id="controls">
+      <h2>Enter Your Answer</h2>
+      <label>Magnitude of the missing force in Newtons:</label>
+      <br>
+      <input type="text" name="magnitude">
+      <br>
+      <label>Direction of the missing force in degrees:</label>
+      <br>
+      <input type="text" name="direction">
+      <br>
+      <button id="submit" onclick="checkAnswer()">Check</button>
+    </div>
   </div>
 </body>
 </html>
