@@ -3,6 +3,9 @@ var STAGE_WIDTH, STAGE_HEIGHT;
 
 var circleRadius = 150;
 
+var measurementTool;
+var measurementToolText;
+
 var stageVectors = [];
 
 function init() {
@@ -13,11 +16,53 @@ function init() {
 	stage = new createjs.Stage("gameCanvas"); // canvas id is gameCanvas
 	stage.mouseEventsEnabled = true;
 	stage.enableMouseOver(); // Default, checks the mouse 20 times/second for hovering cursor changes
+  createjs.Touch.enable(stage);
 
   setupManifest(); // preloadJS
   startPreload();
 
+  initModal();
+  initEventListeners();
+
   stage.update();
+}
+
+function initEventListeners() {
+  $("#magnitude, #direction").on("input", function() {
+    $("#direction, #magnitude, #feedback").removeClass("incorrect");
+    $("#feedback").html("Hover your mouse over the force table to determine the directions of the shown forces.");
+  });
+}
+
+function initModal() {
+  // Get the modal
+  var modal = document.getElementById('instructionsModal');
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("instructions");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks the button, open the modal
+  btn.onclick = function() {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  // Open Modal on page load.
+  modal.style.display = "block";
 }
 
 function initGraphics() {
@@ -27,6 +72,100 @@ function initGraphics() {
   for (var vector of vectors) {
     drawVector(vector);
   }
+
+  initAngleMeasurementTool();
+  stage.update();
+}
+
+function initAngleMeasurementTool() {
+  stage.on("stagemousemove", function(event) {
+    stage.removeChild(measurementTool);
+    stage.update();
+    measurementTool = new createjs.Shape();
+    measurementTool.graphics.setStrokeStyle(2);
+    measurementTool.graphics.beginStroke("black");
+    measurementTool.graphics.moveTo(STAGE_WIDTH/2, STAGE_HEIGHT/2);
+    let angle = Math.atan((event.stageY - STAGE_HEIGHT/2)/(event.stageX - STAGE_WIDTH/2))
+    angle = toDegrees(angle);
+    if (event.stageX < STAGE_WIDTH/2) angle += 180;
+    let x = (circleRadius + 30) * Math.cos(toRadians(angle)) + STAGE_WIDTH/2;
+    let y = (circleRadius + 30) * Math.sin(toRadians(angle)) + STAGE_HEIGHT/2;
+    measurementTool.graphics.lineTo(x, y);
+    measurementTool.graphics.beginFill("red");
+    measurementTool.graphics.drawCircle(x, y, 5);
+    stage.addChild(measurementTool);
+
+    stage.removeChild(measurementToolText);
+    angle = -angle;
+    if (angle < 0) angle += 360;
+    // measurementToolText = new createjs.Text(angle.toFixed(0) + "°", "bold 16px Century Gothic", "black");
+    // measurementToolText.x = x;
+    // measurementToolText.y = y;
+    $("#measured").html(angle.toFixed(0) + "°");
+
+    stage.addChild(measurementToolText);
+    stage.update();
+  });
+}
+
+function checkAnswer() {
+
+  if ($("#magnitude").val() == "" || $("#direction").val() == "") {
+    $("#feedback").addClass("incorrect");
+    $("#magnitude").removeClass("incorrect");
+    $("#direction").removeClass("incorrect");
+    $("#feedback").html("Magnitude and direction can not be empty!");
+    return;
+  }
+
+  let x = 0;
+  let y = 0;
+  for (var stageVector of stageVectors) {
+    let vector = stageVector.vector;
+    x += vector.magnitude * Math.cos(toRadians(vector.direction));
+    y += (vector.magnitude * Math.sin(toRadians(vector.direction)));
+  }
+
+  let answerMagnitude = parseFloat(Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)).toFixed(1));
+  let combinedAngle = toDegrees(Math.atan(y/x));
+  if (x < 0) combinedAngle += 180;
+  if (combinedAngle < 0) combinedAngle += 360;
+  let answerAngle = parseInt(combinedAngle + 180) % 360;
+
+  console.log("Answer Angle: " + answerAngle);
+  console.log("Answer Magnitude: " + answerMagnitude);
+
+  var correct = true;
+
+  var providedMagnitude = parseInt($("#magnitude").val());
+  var providedDirection = parseInt($("#direction").val());
+
+  if (Math.abs(providedMagnitude - answerMagnitude) > 5) {
+    correct = false;
+    $('#magnitude').addClass('incorrect');
+  } else {
+    $('#magnitude').addClass('correct');
+  }
+
+  if (Math.abs(providedDirection - answerAngle) > 5) {
+    correct = false;
+    $('#direction').addClass('incorrect');
+  } else {
+    $('#direction').addClass('correct');
+  }
+
+  // If correct, show the answer vector.
+  if (correct) {
+    drawVector({magnitude: answerMagnitude, direction: answerAngle}, "#41f459");
+    $("#feedback").html("Correct! The missing force is shown on the table. Click 'New Vectors' to try another problem.");
+    $("#feedback").addClass("correct");
+    $("#submit").attr("disabled", true);
+    $("#magnitude").attr("disabled", true);
+    $("#direction").attr("disabled", true);
+  } else {
+    $("#feedback").html("Incorrect. Try again!");
+    $("#feedback").addClass("incorrect");
+  }
 }
 
 function drawForceTable() {
@@ -34,7 +173,7 @@ function drawForceTable() {
   var forceTable = new createjs.Shape();
 
   // Draw circle.
-  forceTable.graphics.setStrokeStyle(2);
+  forceTable.graphics.setStrokeStyle(3);
   forceTable.graphics.beginStroke("#42bcf4");
   forceTable.graphics.drawCircle(STAGE_WIDTH/2, STAGE_HEIGHT/2, circleRadius);
 
@@ -51,15 +190,15 @@ function drawForceTable() {
   stage.update();
 }
 
-function drawVector(vector) {
+function drawVector(vector, color="#8f42f4") {
 
   var arrow = new createjs.Shape();
   arrow.graphics.setStrokeStyle(3);
-  arrow.graphics.beginStroke("#8f42f4");
+  arrow.graphics.beginStroke(color);
   arrow.graphics.moveTo(STAGE_WIDTH/2, STAGE_HEIGHT/2);
 
-  let x = circleRadius * Math.cos(toRadians(vector.direction)) + STAGE_WIDTH/2;
-  let y = circleRadius * Math.sin(toRadians(vector.direction)) + STAGE_HEIGHT/2;
+  let x = circleRadius * Math.cos(toRadians(-vector.direction)) + STAGE_WIDTH/2;
+  let y = circleRadius * Math.sin(toRadians(-vector.direction)) + STAGE_HEIGHT/2;
 
   arrow.graphics.lineTo(x, y);
   stage.addChild(arrow);
@@ -68,27 +207,27 @@ function drawVector(vector) {
   var arrowHeadClone = Object.create(arrowHead);
   arrowHeadClone.regX = arrowHead.image.width/2;
   arrowHeadClone.regY = arrowHead.image.height/2;
-  arrowHeadClone.rotation = vector.direction;
+  arrowHeadClone.rotation = -vector.direction;
   arrowHeadClone.x = x;
   arrowHeadClone.y = y;
   arrowHeadClone.scaleX = arrowHeadClone.scaleY = 0.1;
   stage.addChild(arrowHeadClone);
 
   var vectorText = new createjs.Text(vector.magnitude + " N", "16px Century Gothic", "black");
-  if (vector.direction < 90 || vector.direction > 270) {
-    vectorText.x = x + 10;
+  vectorText.x = x;
+  vectorText.y = y;
+  if (vector.direction > 90 && vector.direction < 270) {
+    vectorText.x -= vectorText.getMeasuredWidth() + 10;
   } else {
-    vectorText.x = x - vectorText.getMeasuredWidth() - 10;
+    vectorText.x += 10;
   }
   if (vector.direction > 0 && vector.direction < 180) {
-    vectorText.y = y + 10;
-  } else {
-    vectorText.y = y - vectorText.getMeasuredHeight();
+    vectorText.y -= 10;
   }
   stage.addChild(vectorText);
 
   // Store all vector objects so they can be removed later.
-  stageVectors.push({shape: arrow, arrowHead: arrowHeadClone, text: vectorText});
+  stageVectors.push({shape: arrow, arrowHead: arrowHeadClone, text: vectorText, vector: vector});
   stage.update();
 }
 
@@ -117,6 +256,9 @@ function reset() {
 
   // Clear answer text inputs.
   $("#magnitude, #direction").val("");
+  $("#magnitude, #direction, #feedback").removeClass("correct incorrect");
+  $("#feedback").html("Hover your mouse over the force table to determine the directions of the shown forces.");
+  $("#magnitude, #direction, #submit").attr("disabled", false);
 
   // Remove existing vectors.
   for (var v of stageVectors) {
@@ -124,6 +266,9 @@ function reset() {
     stage.removeChild(v.arrowHead);
     stage.removeChild(v.text);
   }
+
+  // Clear array.
+  stageVectors = [];
 
   // Add 3 new random vectors.
   var vectors = getThreeRandomVectors();

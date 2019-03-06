@@ -11,8 +11,9 @@
 </head>
 <body onload="init()">
   <div id="container">
-    <img src="images/logo.png"/>
+    <img id="logo" src="images/logo.png"/>
     <h1>Force Table</h1>
+    <p id="feedback">Hover your mouse over the force table to determine the directions of the shown forces.</p>
     <canvas width="430px" height="400px" id="gameCanvas"></canvas>
     <div id="controls">
       <h2>Enter Your Answer</h2>
@@ -25,10 +26,28 @@
       <input type="text" name="direction" id="direction" placeholder="Degrees">
       <br>
       <button id="submit" onclick="checkAnswer()">Check</button>
+      <br>
+      <p>Measured Angle: <span id="measured">0°</span></p>
     </div>
     <div id="footer">
       <button id="instructions" onclick="showInstructions()">Show Instructions</button>
       <button id="reset" onclick="reset()">New Vectors</button>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Instructions</h2>
+        <p>A "force table" consists of a circular table with four hanging masses. Each mass has a string which hangs over a pulley and connects the mass to a ring in the
+          center of the table.
+        </p>
+        <img src="images/force_table.jpg"/>
+        <p>When all the forces are in equilibrium, the ring will not move.</p>
+        <p>In the following example, you are shown the top-down view of a force table with three vectors representing the forces of three masses.
+          You must calculate the magnitude and direction of the fourth mass such that the ring will remain in the center of the table.</p>
+      </div>
+
     </div>
   </div>
 </body>
