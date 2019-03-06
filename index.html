@@ -18,13 +18,17 @@
       <h2>Enter Your Answer</h2>
       <label>Magnitude of the missing force in Newtons:</label>
       <br>
-      <input type="text" name="magnitude">
+      <input type="text" name="magnitude" id="magnitude" placeholder="Newtons">
       <br>
       <label>Direction of the missing force in degrees:</label>
       <br>
-      <input type="text" name="direction">
+      <input type="text" name="direction" id="direction" placeholder="Degrees">
       <br>
       <button id="submit" onclick="checkAnswer()">Check</button>
+    </div>
+    <div id="footer">
+      <button id="instructions" onclick="showInstructions()">Show Instructions</button>
+      <button id="reset" onclick="reset()">New Vectors</button>
     </div>
   </div>
 </body>

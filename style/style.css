@@ -21,6 +21,7 @@ canvas {
 
 #controls {
   height: 400px;
+  margin-right: 1em;
 }
 
 #controls input[type='text'] {
@@ -29,6 +30,8 @@ canvas {
   padding: 5px 5px;
   box-sizing: border-box;
   font-size: 20px;
+  width: 100px;
+  text-align: center;
 }
 
 button#submit {
@@ -41,4 +44,27 @@ button#submit {
   display: inline-block;
   font-size: 16px;
   cursor: pointer;
+}
+
+#footer {
+  margin-bottom: 1em;
+}
+
+#footer button {
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#footer button#instructions {
+  background-color: #f49241;
+}
+
+#footer button#reset {
+    background-color: #adadad;
 }

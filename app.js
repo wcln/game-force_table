@@ -3,6 +3,8 @@ var STAGE_WIDTH, STAGE_HEIGHT;
 
 var circleRadius = 150;
 
+var stageVectors = [];
+
 function init() {
   STAGE_WIDTH = parseInt(document.getElementById("gameCanvas").getAttribute("width"));
 	STAGE_HEIGHT = parseInt(document.getElementById("gameCanvas").getAttribute("height"));
@@ -33,7 +35,7 @@ function drawForceTable() {
 
   // Draw circle.
   forceTable.graphics.setStrokeStyle(2);
-  forceTable.graphics.beginStroke("blue");
+  forceTable.graphics.beginStroke("#42bcf4");
   forceTable.graphics.drawCircle(STAGE_WIDTH/2, STAGE_HEIGHT/2, circleRadius);
 
   // Draw dashed lines.
@@ -53,7 +55,7 @@ function drawVector(vector) {
 
   var arrow = new createjs.Shape();
   arrow.graphics.setStrokeStyle(3);
-  arrow.graphics.beginStroke("purple");
+  arrow.graphics.beginStroke("#8f42f4");
   arrow.graphics.moveTo(STAGE_WIDTH/2, STAGE_HEIGHT/2);
 
   let x = circleRadius * Math.cos(toRadians(vector.direction)) + STAGE_WIDTH/2;
@@ -85,7 +87,8 @@ function drawVector(vector) {
   }
   stage.addChild(vectorText);
 
-
+  // Store all vector objects so they can be removed later.
+  stageVectors.push({shape: arrow, arrowHead: arrowHeadClone, text: vectorText});
   stage.update();
 }
 
@@ -108,6 +111,25 @@ function getThreeRandomVectors() {
     });
   }
   return vectors;
+}
+
+function reset() {
+
+  // Clear answer text inputs.
+  $("#magnitude, #direction").val("");
+
+  // Remove existing vectors.
+  for (var v of stageVectors) {
+    stage.removeChild(v.shape);
+    stage.removeChild(v.arrowHead);
+    stage.removeChild(v.text);
+  }
+
+  // Add 3 new random vectors.
+  var vectors = getThreeRandomVectors();
+  for (var vector of vectors) {
+    drawVector(vector);
+  }
 }
 
 function toDegrees (angle) {
