@@ -83,7 +83,7 @@ function initAngleMeasurementTool() {
     stage.update();
     measurementTool = new createjs.Shape();
     measurementTool.graphics.setStrokeStyle(2);
-    measurementTool.graphics.beginStroke("black");
+    measurementTool.graphics.beginStroke("red");
     measurementTool.graphics.moveTo(STAGE_WIDTH/2, STAGE_HEIGHT/2);
     let angle = Math.atan((event.stageY - STAGE_HEIGHT/2)/(event.stageX - STAGE_WIDTH/2))
     angle = toDegrees(angle);
@@ -98,9 +98,7 @@ function initAngleMeasurementTool() {
     stage.removeChild(measurementToolText);
     angle = -angle;
     if (angle < 0) angle += 360;
-    // measurementToolText = new createjs.Text(angle.toFixed(0) + "°", "bold 16px Century Gothic", "black");
-    // measurementToolText.x = x;
-    // measurementToolText.y = y;
+
     $("#measured").html(angle.toFixed(0) + "°");
 
     stage.addChild(measurementToolText);
@@ -131,9 +129,6 @@ function checkAnswer() {
   if (x < 0) combinedAngle += 180;
   if (combinedAngle < 0) combinedAngle += 360;
   let answerAngle = parseInt(combinedAngle + 180) % 360;
-
-  console.log("Answer Angle: " + answerAngle);
-  console.log("Answer Magnitude: " + answerMagnitude);
 
   var correct = true;
 
@@ -174,7 +169,7 @@ function drawForceTable() {
 
   // Draw circle.
   forceTable.graphics.setStrokeStyle(3);
-  forceTable.graphics.beginStroke("#42bcf4");
+  forceTable.graphics.beginFill("black");
   forceTable.graphics.drawCircle(STAGE_WIDTH/2, STAGE_HEIGHT/2, circleRadius);
 
   // Draw dashed lines.
@@ -186,6 +181,12 @@ function drawForceTable() {
   forceTable.graphics.lineTo(STAGE_WIDTH/2 + circleRadius, STAGE_HEIGHT/2);
 
   stage.addChild(forceTable);
+
+  // Add "Force Table" text.
+  var forceTableText = new createjs.Text("Force Table", "bold 22px Century Gothic", "white");
+  forceTableText.x = STAGE_WIDTH/2 - forceTableText.getMeasuredWidth()/2;
+  forceTableText.y = STAGE_HEIGHT/2 - forceTableText.getMeasuredHeight()/2;
+  stage.addChild(forceTableText);
 
   stage.update();
 }
@@ -201,7 +202,7 @@ function drawVector(vector, color="#8f42f4") {
   let y = circleRadius * Math.sin(toRadians(-vector.direction)) + STAGE_HEIGHT/2;
 
   arrow.graphics.lineTo(x, y);
-  stage.addChild(arrow);
+  stage.addChildAt(arrow, 1);
 
   // Draw arrow head.
   var arrowHeadClone = null;
@@ -321,7 +322,7 @@ function startPreload() {
 }
 
 function handleFileLoad(event) {
-	console.log("A file has loaded of type: " + event.item.type);
+
   // create bitmaps of images
   if (event.item.id == "arrow_head") {
     arrowHead = new createjs.Bitmap(event.result);
@@ -331,7 +332,7 @@ function handleFileLoad(event) {
 }
 
 function loadError(evt) {
-    console.log("Error!",evt.text);
+
 }
 
 // not currently used as load time is short
@@ -343,7 +344,6 @@ function handleFileProgress(event) {
  * Displays the start screen.
  */
 function loadComplete(event) {
-  console.log("Finished Loading Assets");
 
   initGraphics();
 }
