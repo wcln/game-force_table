@@ -204,7 +204,13 @@ function drawVector(vector, color="#8f42f4") {
   stage.addChild(arrow);
 
   // Draw arrow head.
-  var arrowHeadClone = Object.create(arrowHead);
+  var arrowHeadClone = null;
+  if (color == "#41f459") {
+    arrowHeadClone = Object.create(arrowHeadCorrect);
+  } else {
+    arrowHeadClone = Object.create(arrowHead);
+  }
+
   arrowHeadClone.regX = arrowHead.image.width/2;
   arrowHeadClone.regY = arrowHead.image.height/2;
   arrowHeadClone.rotation = -vector.direction;
@@ -288,13 +294,17 @@ function toRadians (angle) {
 //////////////////////// PRELOADJS FUNCTIONS
 
 // bitmap variables
-var arrowHead;
+var arrowHead, arrowHeadCorrect;
 
 function setupManifest() {
  	manifest = [
     {
       src: "images/arrow_head.png",
       id: "arrow_head"
+    },
+    {
+      src: "images/arrow_head_correct.png",
+      id: "arrow_head_correct"
     }
  	];
 }
@@ -315,6 +325,8 @@ function handleFileLoad(event) {
   // create bitmaps of images
   if (event.item.id == "arrow_head") {
     arrowHead = new createjs.Bitmap(event.result);
+  } else if (event.item.id == "arrow_head_correct") {
+    arrowHeadCorrect = new createjs.Bitmap(event.result);
   }
 }
 
